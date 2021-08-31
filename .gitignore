@@ -1,0 +1,5 @@
+# Distro ISO files
+*.iso
+
+# Hard Drive files
+*.qcow2

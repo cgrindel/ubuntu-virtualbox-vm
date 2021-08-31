@@ -27,32 +27,42 @@ $ brew install --cask virtualbox-extension-pack
 wget https://releases.ubuntu.com/20.04/ubuntu-20.04.3-desktop-amd64.iso
 ```
 
-### Create the Hard Drive File
+### Create the VM and Install Ubuntu
 
-
-
-
-
-### Start the VM and Install Ubuntu
-
-Once the ISO is downloaded and the hard drive file are created, it is time to launch the VM and
-install Ubuntu.
+Once the ISO is downloaded, it is time to create the VM and install Ubuntu.
 
 ```sh
-$ ./start-ubuntu.sh --install
+$ ./create-vm.sh
 ```
 
 The above command should create a GUI window where the Ubuntu installer should be visible.
 
 Select the minimal install options.
 
+### Install ssh on VM
+
+To launch the VM, run the start script.
+
+```sh
+$ ./start-ubuntu.sh
+```
+
+Using Microsoft Remote Desktop, connect to `localhost:10001`. Open a Terminal window and install
+ssh.
+
+```sh
+$ sudo apt-get install ssh
+```
+
+Log out of the RDP session.
+
 
 ### Set Up SSH Config on the Host
 
-Add a `Host` entry to the host `~/.ssh/config`.
+On the host, add a `Host` entry to the host `~/.ssh/config`.
 
 ```ssh-config
-Host ubuntu-qemu-vm
+Host ubuntu-vm
     HostName localhost
     Port 10022
 ```
@@ -63,15 +73,66 @@ something like the following:
 ```ssh-config
 IgnoreUnknown UseKeychain
 
-Host ubuntu-qemu-vm
-    HostName localhost
-    Port 10022
-
 Host *
   AddKeysToAgent yes
   UseKeychain yes
   IdentityFile ~/.ssh/personal_id_rsa
+  ForwardAgent yes
+
+Host ubuntu-vm
+  HostName localhost
+  Port 10022
 ```
+
+You should be able to SSH into the VM by running the following on the host:
+
+```sh
+$ ssh chuck@ubuntu-vm
+```
+
+Logout of the SSH session.
+
+Copy your public key to the VM. On the host, run the following:
+
+```sh
+$ ssh-copy-id -i ~/.ssh/personal_id_rsa chuck@ubuntu-vm
+```
+
+When complete, try logging into the VM again. You should not be prompted for a password.
+
+
+```sh
+$ ssh chuck@ubuntu-vm
+```
+
+
+### Install the stuff we need: tmux, git
+
+In the VM, run the following to install git, vim, zsh and related packages:
+
+```sh
+sudo apt-get install tmux git vim zsh powerline fonts-powerline
+```
+
+Run the following to change the default shell:
+
+```sh
+chsh -s /bin/zsh
+```
+
+Log out of the SSH session and log back into the server.
+
+
+### Set up the machine for development
+
+```sh
+mkdir -p code/cgrindel
+cd code/cgrindel
+git clone git@github.com:cgrindel/dev-machine.git
+cd dev-machine
+./setup
+```
+
 
 ## Run VM
 
@@ -84,7 +145,7 @@ $ ./start-ubuntu.sh
 To SSH into the VM, run the following:
 
 ```sh
-$ ssh chuck@ubuntu-qemu-vm
+$ ssh chuck@ubuntu-vm
 ```
 
 ## Set Up Swift
@@ -102,7 +163,8 @@ $ sudo apt install binutils git gnupg2 libc6-dev libcurl4 libedit2 libgcc-9-dev 
     libsqlite3-0 libstdc++-9-dev libxml2 libz3-dev pkg-config tzdata zlib1g-dev
 
 # Download Swift
-$ wget https://swift.org/builds/swift-5.3.3-release/ubuntu2004/swift-5.3.3-RELEASE/swift-5.3.3-RELEASE-ubuntu20.04.tar.gz
+cd ~/Downloads
+wget https://swift.org/builds/swift-5.3.3-release/ubuntu2004/swift-5.3.3-RELEASE/swift-5.3.3-RELEASE-ubuntu20.04.tar.gz
 
 ```
 
@@ -111,7 +173,7 @@ $ wget https://swift.org/builds/swift-5.3.3-release/ubuntu2004/swift-5.3.3-RELEA
 Extract the tarball.
 
 ```sh
-$ tar -xvzf swift-5.3.3-RELEASE-ubuntu20.04.tar.gz -C ~
+tar -xvzf swift-5.3.3-RELEASE-ubuntu20.04.tar.gz -C ~
 ```
 
 Add the Swift executables to the path in your init script. The following will add it for bash.
@@ -132,10 +194,11 @@ $ swift --version
 Download the binary and install it in `/usr/local/bin`.
 
 ```sh
-$ wget https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-linux-amd64
-$ sudo chmod +x bazelisk-linux-amd64
-$ sudo mv bazelisk-linux-amd64 /usr/local/bin/bazelisk
-$ sudo ln -s /usr/local/bin/bazelisk /usr/local/bin/bazel
+cd ~/Downloads
+wget https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-linux-amd64
+sudo chmod +x bazelisk-linux-amd64
+sudo mv bazelisk-linux-amd64 /usr/local/bin/bazelisk
+sudo ln -s /usr/local/bin/bazelisk /usr/local/bin/bazel
 ```
 
 
