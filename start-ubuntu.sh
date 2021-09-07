@@ -16,8 +16,6 @@ while [[ $# -gt 0 ]]; do
     *)
       args+=("${1}")
       shift 1
-      # echo >&2 "Unrecognized argument: ${1}" 
-      # exit 1
       ;;
   esac
 done
