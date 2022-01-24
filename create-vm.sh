@@ -22,6 +22,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+rdp_port=10001
+
 vm_path="${output_dir}/${machine_name}"
 if [[ -d "${vm_path}" ]]; then
   echo >&2 "The specified virtual machine (${machine_name}) already exists. ${vm_path}" 

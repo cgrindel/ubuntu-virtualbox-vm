@@ -35,13 +35,17 @@ Once the ISO is downloaded, it is time to create the VM and install Ubuntu.
 $ ./create-vm.sh
 ```
 
-The above command should create a GUI window where the Ubuntu installer should be visible.
+Using Microsoft Remote Desktop, connect to `localhost:10001` and login with the username `ubuntu`
+and password `ubuntu`.
 
-Select the minimal install options.
+Select the minimal install options and create your user account using the GUI. Restart the VM.
+
+The VM graphics may not work properly after the restart. If so, open `VirtualBox`, edit the settings
+for the VM and make sure that the graphics controller is `VMSVGA`.
 
 ### Install ssh on VM
 
-To launch the VM, run the start script.
+Launch the VM if it is not already running. To launch the VM, run the start script.
 
 ```sh
 $ ./start-ubuntu.sh
@@ -154,6 +158,8 @@ $ ssh chuck@ubuntu-vm
 
 ### Download Swift and the dependencies
 
+Check for [the latest release](https://www.swift.org/download/) when installing.
+
 ```sh
 # Update the index and upgrade installed packages.
 $ sudo apt update && sudo apt upgrade
@@ -191,11 +197,13 @@ $ swift --version
 
 ## Set Up Bazelisk
 
+Check for [the latest version of Baselisk](https://github.com/bazelbuild/bazelisk/releases).
+
 Download the binary and install it in `/usr/local/bin`.
 
 ```sh
 cd ~/Downloads
-wget https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-linux-amd64
+wget https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64
 sudo chmod +x bazelisk-linux-amd64
 sudo mv bazelisk-linux-amd64 /usr/local/bin/bazelisk
 sudo ln -s /usr/local/bin/bazelisk /usr/local/bin/bazel
